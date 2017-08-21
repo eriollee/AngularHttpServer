@@ -17,6 +17,19 @@ export class Product  {
 	}
 }
 
+export class Comment  {
+	constructor(
+		public id:number,
+		public productId:number,
+		public timestamp:string,
+		public user:string,
+		public rating:number,
+		public content:string
+	){
+		// code...
+	}
+}
+
 
 const products:Product[] =[
   		new Product(1,"第一个商品",1.99,3.5,"这是一个商品描述32424322423",["电子产品","硬件设备"]),
@@ -25,6 +38,17 @@ const products:Product[] =[
   		new Product(4,"第四个商品",1.99,1.5,"这是一个商品描述32424322423",["图书"]),
   		new Product(5,"第五个商品",1.99,1.5,"这是一个商品描述32424322423",["电子产品","硬件设备"]),
 ];
+
+
+ const comments:Comment[]=[
+  		new Comment(1,1,"2014-02-02 22:22:22","张三",3.5,"不错"),
+  		new Comment(2,1,"2018-02-02 23:22:22","李四",1.5,"啊啊不错"),
+  		new Comment(3,1,"2017-02-02 11:22:22","张三",4.5,"版本不错"),
+  		new Comment(1,2,"2014-02-02 22:22:22","王五",2.0,"不错"),
+  		new Comment(2,2,"2014-02-02 22:22:22","小明",3.5,"不错"),
+  		new Comment(1,3,"2014-02-02 22:22:22","小王",3.5,"不错"),
+  		new Comment(2,3,"2014-02-02 22:22:22","张三",3.5,"不错"),
+  	 ]
 
 app.get('/',(req,res)=>{
 	res.send("hello expesss");
@@ -38,6 +62,11 @@ app.get('/api/products',(req,res)=>{
 app.get('/api/product/:id',(req,res)=>{
 	res.json(products.find((product)=>product.id == req.params.id));
 });
+
+app.get('/api/product/:id/comments',(req,res)=>{
+	res.json(comments.filter((comment:Comment)=>comment.productId==req.params.id));
+});
+
 
 
 const server = app.listen(8000,"localhost",()=>{
