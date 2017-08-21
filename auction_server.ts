@@ -56,7 +56,28 @@ app.get('/',(req,res)=>{
 
 
 app.get('/api/products',(req,res)=>{
-	res.json(products);
+	let result = products;
+
+	let params = req.query;
+
+	console.log(params);
+	console.log(params.title);
+	if(params.title){
+		result = result.filter((p)=> p.title.indexOf(params.title)!==-1);
+		console.log(result);
+	}
+
+	if(params.price && result.length> 0){
+		result = result.filter((p)=> p.price<= parseInt(params.price));
+	}
+
+
+	if(params.category !=="-1" && result.length> 0){
+		result = result.filter((p)=> p.categoires.indexOf(params.category)!==-1);
+	}
+
+
+	res.json(result);
 });
 
 app.get('/api/product/:id',(req,res)=>{
