@@ -94,18 +94,47 @@ const server = app.listen(8000,"localhost",()=>{
 	console.log("server start ,address:localhost 8000")
 });
 
+const subscriptions = new Map<any,number[]>();
+
 const wsServer = new Server({port:8085});
 wsServer.on("connection",websocket =>{
-		websocket.send("server push positively by eriollee")
-		websocket.on("message",message =>{
-			console.log("received message" + message)
-		})
+/*		websocket.send("server push positively by eriollee");*/
+		websocket.on('message',message =>{
+			console.log("received message" + message);
+			let messageObj = JSON.parse(message.toString());
+			console.log(messageObj);
+			let productIds = subscriptions.get(websocket) || [];
+			subscriptions.set(websocket,[...productIds,messageObj.productId]);
+			console.log(subscriptions.get(websocket));
+		});
 });
 
-setInterval(()=>{
+const currentBids = new Map<number,number>();
+
+setInterval(
+()=>{
+	products.forEach( p=>{
+		let currentBid = currentBids.get(p.id) || p.price;
+/*		console.log("currentBid=="+currentBid);*/
+		let newBid = currentBid + Math.random()*5;
+		currentBids.set(p.id,newBid);
+	});
+
+	subscriptions.forEach((productIds:number[],ws)=>{
+		let newBids = productIds.map(pid => ({
+			productId:pid,
+			bid:currentBids.get(pid)
+		}));
+		console.log(newBids);
+		ws.send(JSON.stringify(newBids));
+	});
+
+},2000);
+
+/*setInterval(()=>{
 	if(wsServer.clients){
 		wsServer.clients.forEach(client =>{
 			client.send("this is timed push ");
 		})
 	}
-},2000);
+},2000);*/
