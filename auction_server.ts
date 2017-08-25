@@ -1,5 +1,7 @@
-import * as express from 'express'
+import * as express from 'express';
+import * as path from 'path';
 import {Server } from 'ws';
+
 
 const app = express();
 
@@ -50,10 +52,14 @@ const products:Product[] =[
   		new Comment(2,3,"2014-02-02 22:22:22","张三",3.5,"不错"),
   	 ]
 
-app.get('/',(req,res)=>{
+
+
+
+/*app.get('/',(req,res)=>{
 	res.send("hello expesss");
 });
-
+*/
+app.use('/',express.static(path.join(__dirname,'..','client')));
 
 app.get('/api/products',(req,res)=>{
 	let result = products;
@@ -121,12 +127,16 @@ setInterval(
 	});
 
 	subscriptions.forEach((productIds:number[],ws)=>{
+		if(ws.readyState ===1){
 		let newBids = productIds.map(pid => ({
 			productId:pid,
 			bid:currentBids.get(pid)
 		}));
 		console.log(newBids);
 		ws.send(JSON.stringify(newBids));
+		}else{
+			subscriptions.delete(ws);
+		}
 	});
 
 },2000);
